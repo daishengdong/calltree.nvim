@@ -6,7 +6,7 @@ Support the source insight style Reference Dependency Tree.
 
 Has a dependency of cscope_maps.nvim plugin.
 
-[calltree.nvim.webm](https://github.com/daishengdong/calltree.nvim/assets/4813738/728630ed-1862-44d2-98d2-df446b44ddd2)
+[calltree.nvim.webm](https://github.com/daishengdong/calltree.nvim/assets/4813738/3033497d-54d7-4370-b6f5-63e28b69490d)
 
 ## Features
 
