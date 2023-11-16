@@ -1,6 +1,6 @@
 # calltree.nvim
 
-Disclaimer: I straight-up copied much of the code in this plugin from [cscope_maps.nvim](https://github.com/dhananjaylatkar/cscope_maps.nvim), event this README. I want to give credits to the author of cscope_maps.nvim for writing awesome code and thank him for using the MIT licence.
+Disclaimer: I straight-up copied much of the code in this plugin from [cscope_maps.nvim](https://github.com/dhananjaylatkar/cscope_maps.nvim), even this README. I want to give credits to the author of cscope_maps.nvim for writing awesome code and thank him for using the MIT licence.
 
 Support the source insight style Reference Dependency Tree.
 
