@@ -9,10 +9,10 @@ local M = {}
 M.opts = {
     prefix = "<leader>o", -- keep consistent with cscope_maps
 
-    -- brief style only shows a symbol's name
-    -- detailed style shows .. just more details
-    -- see entry_maker()
-    tree_style = "brief", -- alternatives: detailed
+    -- brief: only shows a symbol's name
+    -- detailed: shows just more details
+    -- detailed_paths: shows filename and line number
+    tree_style = "brief", -- alternatives: detailed, detailed_paths
 }
 
 local function entry_maker(symbol)
@@ -20,6 +20,8 @@ local function entry_maker(symbol)
         return symbol.ctx
     elseif M.opts.tree_style == "detailed" then
         return symbol.ctx .. " [" .. symbol.text .. "] +" .. symbol.lnum
+    elseif M.opts.tree_style == "detailed_paths" then
+        return symbol.ctx .. " [" .. symbol.filename .. ":" .. symbol.lnum .. "]"
     end
 end
 
@@ -240,6 +242,9 @@ local function auto_command()
         pattern = "__CALL_TREE__*",
         callback = function()
             vim.keymap.set("n", "r", refresh_tree,
+                { silent = true, noremap = true, buffer = true })
+
+            vim.keymap.set("n", "<Tab>", refresh_tree,
                 { silent = true, noremap = true, buffer = true })
 
             vim.keymap.set("n", "<CR>", jump2symbol,
