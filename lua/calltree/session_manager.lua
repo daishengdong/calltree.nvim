@@ -17,8 +17,12 @@ local function make_buffer(session)
 
     vim.cmd('vertical resize ' .. math.floor(vim.o.columns * 0.2))
     vim.cmd('resize ' .. math.floor(vim.o.lines * 0.2))
+    vim.o.number = false
+    vim.o.relativenumber = false
+
 
     local new_buffer = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_set_option(new_buffer, "filetype", "calltree")
 
     vim.api.nvim_buf_set_name(new_buffer, "__CALL_TREE__." .. symbol.ctx .. "." .. st.stringify(session.type))
 
