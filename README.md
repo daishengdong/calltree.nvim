@@ -40,10 +40,10 @@ _calltree_ comes with following defaults:
 {
     prefix = "<leader>o", -- keep consistent with cscope_maps
 
-    -- brief style only shows a symbol's name
-    -- detailed style shows .. just more details
-    -- see entry_maker()
-    tree_style = "brief", -- alternatives: detailed
+    -- brief: only shows a symbol's name
+    -- detailed: shows just more details
+    -- detailed_paths: shows filename and line number
+    tree_style = "brief", -- alternatives: detailed, detailed_paths
 }
 ```
 
