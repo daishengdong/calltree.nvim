@@ -63,7 +63,7 @@ is `<leader>o`.
 | `<prefix>w`       | switch to the view of relation tree of a certain token with a select prompt                   |
 | enter             | `enter` key pressing in the relation tree jumps to the token in the certain line              |
 | r                 | `r` key pressing in the relation tree expands the relation of the token in the certain line   |
-| <tab>             | `tab` key pressing in the relation tree expands the relation of the token in the certain line |
+| tab               | `tab` key pressing in the relation tree expands the relation of the token in the certain line |
 
 #### Using `:Cscope` command
 
