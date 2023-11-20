@@ -1,4 +1,4 @@
-local session_mgr = require("calltree.session_manager")
+local sm = require("calltree.session_manager")
 local st = require("calltree.session_type")
 local cscope = require("calltree.cscope")
 local debug = require("calltree.debug")
@@ -54,10 +54,10 @@ local function call_tree_helper(session_type)
         return
     end
 
-    local session, is_existing = session_mgr.new_session(session_type, definations[1], definations)
+    local session, is_existing = sm.new_session(session_type, definations[1], definations)
 
     if is_existing then
-        session_mgr.show_session(session)
+        sm.show_session(session)
         return
     end
 
@@ -69,10 +69,10 @@ local function call_tree_helper(session_type)
     end
 
     for _, symbol in pairs(find_func(symbol_name)) do
-        session_mgr.add_symbol_to_root(session, symbol)
+        sm.add_symbol_to_root(session, symbol)
     end
 
-    session_mgr.refresh_ui(session, entry_maker)
+    sm.refresh_ui(session, entry_maker)
 end
 
 local function CallerTree()
@@ -84,7 +84,7 @@ local function CalleeTree()
 end
 
 local function CallTreeClose()
-    local keys = session_mgr.keys_of_all_sessions()
+    local keys = sm.keys_of_all_sessions()
 
     if next(keys) == nil then
         return
@@ -97,17 +97,17 @@ local function CallTreeClose()
         end,
     }, function (choice)
             if choice then
-                session_mgr.close_session(choice)
+                sm.close_session(choice)
             end
         end)
 end
 
 local function CallTreeCloseAll()
-    session_mgr.close_all_sessions()
+    sm.close_all_sessions()
 end
 
 local function CallTreeSwitch()
-    local keys = session_mgr.keys_of_all_sessions()
+    local keys = sm.keys_of_all_sessions()
 
     if next(keys) == nil then
         return
@@ -120,7 +120,7 @@ local function CallTreeSwitch()
         end,
     }, function (choice)
             if choice then
-                session_mgr.jump_to_session(choice)
+                sm.jump_to_session(choice)
             end
         end)
 end
@@ -147,13 +147,13 @@ local function refresh_tree()
     local current_buf = vim.api.nvim_get_current_buf()
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local cursor_line = cursor_pos[1]
-    local session = session_mgr.buf_to_session(current_buf)
+    local session = sm.buf_to_session(current_buf)
 
     if session == nil then
         return
     end
 
-    local tree_node = session_mgr.line_nr_to_tree_node(session, cursor_line)
+    local tree_node = sm.line_nr_to_tree_node(session, cursor_line)
 
     if tree_node == nil then
         vim.notify("invalid tree_node with line_nr: " .. tostring(cursor_line))
@@ -173,10 +173,10 @@ local function refresh_tree()
     end
 
     for _, symbol in pairs(find_func(symbol_name)) do
-        session_mgr.add_symbol_to_parent(session, tree_node, symbol)
+        sm.add_symbol_to_parent(session, tree_node, symbol)
     end
 
-    session_mgr.refresh_ui(session, entry_maker)
+    sm.refresh_ui(session, entry_maker)
 end
 
 local function get_previous_window()
@@ -187,7 +187,6 @@ local function get_previous_window()
 end
 
 local function file_open(window, filename, lnum)
-    -- vim.cmd(":wincmd p")
     vim.api.nvim_set_current_win(window)
     vim.cmd("e " .. filename)
     vim.api.nvim_win_set_cursor(0, { tonumber(lnum), 0 })
@@ -210,16 +209,21 @@ local function jump2symbol()
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local cursor_line = cursor_pos[1]
     local previous_window = get_previous_window()
-    local session = session_mgr.buf_to_session(current_buf)
-    local symbol = session_mgr.line_nr_to_tree_node(session, cursor_line).symbol
+    local session = sm.buf_to_session(current_buf)
 
-    if session == nil or symbol == nil then
+    if session == nil then
+        vim.notify("invalid session for current_buf")
+        return
+    end
+
+    local symbol = sm.line_nr_to_tree_node(session, cursor_line).symbol
+    if symbol == nil then
         vim.notify("invalid symbol with line_nr: " .. tostring(cursor_line))
         return
     end
 
-    if session_mgr.is_root_symbol(session, symbol) and session_mgr.is_root_multi_defination(session) then
-        local symbols = session_mgr.root_definations(session)
+    if sm.is_root_symbol(session, symbol) and sm.is_root_multi_defination(session) then
+        local symbols = sm.root_definations(session)
 
         vim.ui.select(symbols, {
             prompt = "select defination to jump",
@@ -239,7 +243,7 @@ end
 
 local function auto_command()
     vim.api.nvim_create_autocmd("BufEnter", {
-        pattern = "__CALL_TREE__*",
+        pattern = "__CALLTREE__*",
         callback = function()
             vim.keymap.set("n", "r", refresh_tree,
                 { silent = true, noremap = true, buffer = true })
@@ -258,11 +262,11 @@ local function init_keymaps(prefix)
     if ok then
         wk.register({ [prefix] = { name = "+cscope" } })
     end
-    vim.keymap.set("n", prefix .. "r", function() CallerTree() end, { desc = "caller tree" })
-    vim.keymap.set("n", prefix .. "R", function() CalleeTree() end, { desc = "callee tree" })
-    vim.keymap.set("n", prefix .. "x", function() CallTreeClose() end, { desc = "close call tree" })
-    vim.keymap.set("n", prefix .. "X", function() CallTreeCloseAll() end, { desc = "close all call trees" })
-    vim.keymap.set("n", prefix .. "w", function() CallTreeSwitch() end, { desc = "switch call tree" })
+    vim.keymap.set("n", prefix .. "r", function() CallerTree() end, { desc = "Caller tree" })
+    vim.keymap.set("n", prefix .. "R", function() CalleeTree() end, { desc = "Callee tree" })
+    vim.keymap.set("n", prefix .. "x", function() CallTreeClose() end, { desc = "Close call tree" })
+    vim.keymap.set("n", prefix .. "X", function() CallTreeCloseAll() end, { desc = "Close all call trees" })
+    vim.keymap.set("n", prefix .. "w", function() CallTreeSwitch() end, { desc = "Switch call tree" })
 end
 
 M.setup = function(opts)

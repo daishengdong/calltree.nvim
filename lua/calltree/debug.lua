@@ -1,8 +1,7 @@
 local M = {}
 
 M.opts = {
-    -- presenter = "win",
-    presenter = "notify",
+    presenter = "notify", -- alternatives: notify, win
 }
 
 local win_presenter = function(lines)

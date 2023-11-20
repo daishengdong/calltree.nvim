@@ -20,11 +20,10 @@ local function make_buffer(session)
     vim.o.number = false
     vim.o.relativenumber = false
 
-
     local new_buffer = vim.api.nvim_get_current_buf()
     vim.api.nvim_buf_set_option(new_buffer, "filetype", "calltree")
 
-    vim.api.nvim_buf_set_name(new_buffer, "__CALL_TREE__." .. symbol.ctx .. "." .. st.stringify(session.type))
+    vim.api.nvim_buf_set_name(new_buffer, "__CALLTREE__." .. symbol.ctx .. "." .. st.stringify(session.type))
 
     vim.api.nvim_set_current_win(current_window)
     vim.api.nvim_win_set_cursor(0, cursor_pos)

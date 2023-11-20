@@ -2,7 +2,7 @@
 
 Disclaimer: I straight-up copied much of the code in this plugin from [cscope_maps.nvim](https://github.com/dhananjaylatkar/cscope_maps.nvim), even this README. I want to give credits to the author of cscope_maps.nvim for writing awesome code and thank him for using the MIT licence.
 
-Support the source insight style Reference Dependency Tree.
+Support the `Source Insight` style reference dependency tree.
 
 Has a dependency of cscope_maps.nvim plugin.
 
@@ -54,15 +54,16 @@ _calltree_ comes with following defaults:
 `<prefix>` can be configured using `prefix` option. Default value for prefix
 is `<leader>o`.
 
-| Keymaps           | Description                                                                                 |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| `<prefix>r`       | draw relation tree of the callers of the token under cursor                                 |
-| `<prefix>R`       | draw relation tree of the callees of the token under cursor                                 |
-| `<prefix>x`       | close the relation tree of a certain token with a select prompt                             |
-| `<prefix>X`       | close all the relation trees                                                                |
-| `<prefix>w`       | switch to the view of relation tree of a certain token with a select prompt                 |
-| enter             | `enter` key pressing in the relation tree jumps to the token in the certain line            |
-| r                 | `r` key pressing in the relation tree expands the relation of the token in the certain line |
+| Keymaps           | Description                                                                                   |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| `<prefix>r`       | draw relation tree of the callers of the token under cursor                                   |
+| `<prefix>R`       | draw relation tree of the callees of the token under cursor                                   |
+| `<prefix>x`       | close the relation tree of a certain token with a select prompt                               |
+| `<prefix>X`       | close all the relation trees                                                                  |
+| `<prefix>w`       | switch to the view of relation tree of a certain token with a select prompt                   |
+| enter             | `enter` key pressing in the relation tree jumps to the token in the certain line              |
+| r                 | `r` key pressing in the relation tree expands the relation of the token in the certain line   |
+| <tab>             | `tab` key pressing in the relation tree expands the relation of the token in the certain line |
 
 #### Using `:Cscope` command
 
