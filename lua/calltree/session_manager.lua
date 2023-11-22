@@ -40,6 +40,7 @@ M.refresh_ui = function(session, entry_maker)
     session.line_nr_to_tree_node = {}
     local char_graph = tree.char_graph(session.tree_root, entry_maker, session.line_nr_to_tree_node)
     vim.api.nvim_buf_set_lines(session.call_tree_buffer, 0, -1, false, char_graph)
+    vim.api.nvim_set_current_win(session.call_tree_window)
 end
 
 M.buf_to_session = function(buf)
@@ -108,7 +109,7 @@ local function find_session(type, the_symbol)
     return nil
 end
 
-M.new_session = function(type, symbol, root_definations)
+M.new_session = function(parser, type, symbol, root_definations)
     local existing_session = find_session(type, symbol)
 
     if existing_session ~= nil then
@@ -120,6 +121,12 @@ M.new_session = function(type, symbol, root_definations)
 
     session.tree_root = tree.make_node(symbol)
     session.type = type
+    session.parser = parser
+    if type == st.type.CALLER_TREE then
+        session.find_func = parser.find_caller
+    else
+        session.find_func = parser.find_callee
+    end
     session.root_definations = root_definations
     session.line_nr_to_tree_node = {}
     session.call_tree_window = nil

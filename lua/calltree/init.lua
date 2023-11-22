@@ -1,6 +1,8 @@
+local utils = require("calltree.utils")
 local sm = require("calltree.session_manager")
 local st = require("calltree.session_type")
 local cscope = require("calltree.cscope")
+local lsp = require("calltree.lsp")
 local debug = require("calltree.debug")
 
 local M = {}
@@ -42,45 +44,46 @@ local function cword()
     return word
 end
 
-local function call_tree_helper(session_type)
+local function call_tree_helper(parser, session_type)
     local symbol_name = cword()
     if symbol_name == nil then
         return
     end
 
-    local definations = cscope.find_defination(symbol_name)
+    local definations = parser.find_defination(symbol_name)
     if #definations == 0 then
         vim.notify("no legal defination for " .. symbol_name)
         return
     end
 
-    local session, is_existing = sm.new_session(session_type, definations[1], definations)
+    local session, is_existing = sm.new_session(parser, session_type, definations[1], definations)
 
     if is_existing then
         sm.show_session(session)
         return
     end
 
-    local find_func
-    if session.type == st.type.CALLER_TREE then
-        find_func = cscope.find_caller
-    else
-        find_func = cscope.find_callee
-    end
-
-    for _, symbol in pairs(find_func(symbol_name)) do
+    for _, symbol in pairs(session.find_func(nil, symbol_name)) do
         sm.add_symbol_to_root(session, symbol)
     end
 
     sm.refresh_ui(session, entry_maker)
 end
 
-local function CallerTree()
-    call_tree_helper(st.type.CALLER_TREE)
+local function CallerTreeCscope()
+    call_tree_helper(cscope, st.type.CALLER_TREE)
 end
 
-local function CalleeTree()
-    call_tree_helper(st.type.CALLEE_TREE)
+local function CalleeTreeCscope()
+    call_tree_helper(cscope, st.type.CALLEE_TREE)
+end
+
+local function CallerTreeLsp()
+    call_tree_helper(lsp, st.type.CALLER_TREE)
+end
+
+local function CalleeTreeLsp()
+    call_tree_helper(lsp, st.type.CALLEE_TREE)
 end
 
 local function CallTreeClose()
@@ -126,11 +129,17 @@ local function CallTreeSwitch()
 end
 
 local function user_command()
-    vim.api.nvim_create_user_command("CallerTree", function()
-        CallerTree()
+    vim.api.nvim_create_user_command("CallerTreeCscope", function()
+        CallerTreeCscope()
     end, {})
-    vim.api.nvim_create_user_command("CalleeTree", function()
-        CalleeTree()
+    vim.api.nvim_create_user_command("CalleeTreeCscope", function()
+        CalleeTreeCscope()
+    end, {})
+    vim.api.nvim_create_user_command("CallerTreeLsp", function()
+        CallerTreeLsp()
+    end, {})
+    vim.api.nvim_create_user_command("CalleeTreeLsp", function()
+        CalleeTreeLsp()
     end, {})
     vim.api.nvim_create_user_command("CallTreeClose", function()
         CallTreeClose()
@@ -164,39 +173,11 @@ local function refresh_tree()
         return
     end
 
-    local symbol_name = tree_node.symbol.ctx
-    local find_func
-    if session.type == st.type.CALLER_TREE then
-        find_func = cscope.find_caller
-    else
-        find_func = cscope.find_callee
-    end
-
-    for _, symbol in pairs(find_func(symbol_name)) do
+    for _, symbol in pairs(session.find_func(tree_node.symbol, tree_node.symbol.ctx)) do
         sm.add_symbol_to_parent(session, tree_node, symbol)
     end
 
     sm.refresh_ui(session, entry_maker)
-end
-
-local function get_previous_window()
-    vim.cmd(":wincmd p")
-    local previous_window = vim.api.nvim_get_current_win()
-    vim.cmd(":wincmd p")
-    return previous_window
-end
-
-local function file_open(window, filename, lnum)
-    vim.api.nvim_set_current_win(window)
-    vim.cmd("e " .. filename)
-    vim.api.nvim_win_set_cursor(0, { tonumber(lnum), 0 })
-end
-
-local function symbol_open(window, symbol)
-    local filename = symbol.filename
-    local lnum = symbol.lnum
-
-    file_open(window, filename, lnum)
 end
 
 local function relative_path(path)
@@ -208,7 +189,7 @@ local function jump2symbol()
     local current_buf = vim.api.nvim_get_current_buf()
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local cursor_line = cursor_pos[1]
-    local previous_window = get_previous_window()
+    local previous_window = utils.get_previous_window()
     local session = sm.buf_to_session(current_buf)
 
     if session == nil then
@@ -232,13 +213,13 @@ local function jump2symbol()
             end,
         }, function (choice)
                 if choice then
-                    symbol_open(previous_window, choice)
+                    utils.symbol_open(previous_window, choice)
                 end
             end)
         return
     end
 
-    symbol_open(previous_window, symbol)
+    utils.symbol_open(previous_window, symbol)
 end
 
 local function auto_command()
@@ -262,8 +243,10 @@ local function init_keymaps(prefix)
     if ok then
         wk.register({ [prefix] = { name = "+cscope" } })
     end
-    vim.keymap.set("n", prefix .. "r", function() CallerTree() end, { desc = "Caller tree" })
-    vim.keymap.set("n", prefix .. "R", function() CalleeTree() end, { desc = "Callee tree" })
+    vim.keymap.set("n", prefix .. "r", function() CallerTreeCscope() end, { desc = "Caller tree(cscope)" })
+    vim.keymap.set("n", prefix .. "R", function() CalleeTreeCscope() end, { desc = "Callee tree(cscope)" })
+    vim.keymap.set("n", prefix .. "l", function() CallerTreeLsp() end, { desc = "Caller tree(lsp)" })
+    vim.keymap.set("n", prefix .. "L", function() CalleeTreeLsp() end, { desc = "Callee tree(lsp)" })
     vim.keymap.set("n", prefix .. "x", function() CallTreeClose() end, { desc = "Close call tree" })
     vim.keymap.set("n", prefix .. "X", function() CallTreeCloseAll() end, { desc = "Close all call trees" })
     vim.keymap.set("n", prefix .. "w", function() CallTreeSwitch() end, { desc = "Switch call tree" })

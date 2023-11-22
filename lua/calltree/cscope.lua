@@ -27,6 +27,7 @@ local cscope_parse_line = function(line)
     t["filename"] = sp[1]
     t["ctx"] = sp[2]
     t["lnum"] = sp[3]
+    t["col"] = 0
     local sz = #sp[1] + #sp[2] + #sp[3] + 3
 
     -- Populate t["text"] with search result
@@ -51,7 +52,7 @@ local cscope_parse_output = function(cs_out)
     return res
 end
 
-local cscope_find_helper = function(op_n, op_s, symbol)
+local cscope_find_helper = function(op_n, op_s, symbol_name)
     -- Executes cscope search and shows result in QuickFix List or Telescope
 
     local db_file = vim.g.cscope_maps_db_file or require("cscope").opts.db_file
@@ -62,7 +63,7 @@ local cscope_find_helper = function(op_n, op_s, symbol)
         return {}
     end
 
-    cmd = cmd .. " -dL" .. " -" .. op_n .. " " .. symbol
+    cmd = cmd .. " -dL" .. " -" .. op_n .. " " .. symbol_name
 
     local file = assert(io.popen(cmd, "r"))
     file:flush()
@@ -70,7 +71,7 @@ local cscope_find_helper = function(op_n, op_s, symbol)
     file:close()
 
     if output == "" then
-        vim.notify("no results for 'cscope find " .. op_s .. " " .. symbol .. "'")
+        vim.notify("no results for 'cscope find " .. op_s .. " " .. symbol_name .. "'")
         return {}
     end
 
@@ -79,30 +80,30 @@ local cscope_find_helper = function(op_n, op_s, symbol)
     -- Push current symbol on tagstack
     cscope_push_tagstack()
 
-    -- debug.dump_table("parsed_output", parsed_output)
-
     return parsed_output
 end
 
-M.find_defination = function(symbol)
+M.find_defination = function(symbol_name)
     local op_s = "g"
     local op_n = "1"
 
-    return cscope_find_helper(op_n, op_s, symbol)
+    return cscope_find_helper(op_n, op_s, symbol_name)
 end
 
-M.find_caller = function(symbol)
+M.find_caller = function(symbol, symbol_name)
     local op_s = "c"
     local op_n = "3"
 
-    return cscope_find_helper(op_n, op_s, symbol)
+    symbol = symbol -- make lsp happy
+    return cscope_find_helper(op_n, op_s, symbol_name)
 end
 
-M.find_callee = function(symbol)
+M.find_callee = function(symbol, symbol_name)
     local op_s = "d"
     local op_n = "2"
 
-    return cscope_find_helper(op_n, op_s, symbol)
+    symbol = symbol -- make lsp happy
+    return cscope_find_helper(op_n, op_s, symbol_name)
 end
 
 return M
