@@ -8,6 +8,12 @@ Has a dependency of cscope_maps.nvim plugin(if use cscope as parser).
 
 [calltree.nvim.webm](https://github.com/daishengdong/calltree.nvim/assets/4813738/3033497d-54d7-4370-b6f5-63e28b69490d)
 
+LSP as parser:
+
+![calltree lsp python](https://github.com/daishengdong/calltree.nvim/assets/4813738/b30223bf-6e6b-446a-ab18-1020ab53a72f)
+
+![calltree lsp c](https://github.com/daishengdong/calltree.nvim/assets/4813738/7f82f2e4-f151-440a-beba-6c0fff39aa17)
+
 ## Features
 
 - Opens results in another bottom window.
