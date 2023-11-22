@@ -152,7 +152,7 @@ local function user_command()
     end, {})
 end
 
-local function refresh_tree()
+local function toggle_tree()
     local current_buf = vim.api.nvim_get_current_buf()
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     local cursor_line = cursor_pos[1]
@@ -170,11 +170,13 @@ local function refresh_tree()
     end
 
     if #tree_node.children ~= 0 then
-        return
-    end
-
-    for _, symbol in pairs(session.find_func(tree_node.symbol, tree_node.symbol.ctx)) do
-        sm.add_symbol_to_parent(session, tree_node, symbol)
+        -- if node is expanded, remove symbols
+        tree_node.children = {}
+    else
+        -- if node is collapsed, add symbols
+        for _, symbol in pairs(session.find_func(tree_node.symbol, tree_node.symbol.ctx)) do
+            sm.add_symbol_to_parent(session, tree_node, symbol)
+        end
     end
 
     sm.refresh_ui(session, entry_maker)
@@ -226,10 +228,10 @@ local function auto_command()
     vim.api.nvim_create_autocmd("BufEnter", {
         pattern = "__CALLTREE__*",
         callback = function()
-            vim.keymap.set("n", "r", refresh_tree,
+            vim.keymap.set("n", "r", toggle_tree,
                 { silent = true, noremap = true, buffer = true })
 
-            vim.keymap.set("n", "<Tab>", refresh_tree,
+            vim.keymap.set("n", "<Tab>", toggle_tree,
                 { silent = true, noremap = true, buffer = true })
 
             vim.keymap.set("n", "<CR>", jump2symbol,
