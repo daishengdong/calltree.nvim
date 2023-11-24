@@ -61,18 +61,17 @@ _calltree_ comes with following defaults:
 `<prefix>` can be configured using `prefix` option. Default value for prefix
 is `<leader>o`.
 
-| Keymaps           | Description                                                                                   |
-| ----------------- | --------------------------------------------------------------------------------------------- |
-| `<prefix>r`       | draw relation tree of the callers of the token under cursor, based on `cscope`                |
-| `<prefix>R`       | draw relation tree of the callees of the token under cursor, based on `cscope`                |
-| `<prefix>l`       | draw relation tree of the callers of the token under cursor, based on `LSP`                   |
-| `<prefix>L`       | draw relation tree of the callees of the token under cursor, based on `LSP`                   |
-| `<prefix>x`       | close the relation tree of a certain token with a select prompt                               |
-| `<prefix>X`       | close all the relation trees                                                                  |
-| `<prefix>w`       | switch to the view of relation tree of a certain token with a select prompt                   |
-| enter             | `enter` key pressing in the relation tree jumps to the token in the certain line              |
-| r                 | `r` key pressing in the relation tree expands the relation of the token in the certain line   |
-| tab               | `tab` key pressing in the relation tree expands the relation of the token in the certain line |
+| Keymaps        | Description                                                                         |
+|----------------|-------------------------------------------------------------------------------------|
+| `<prefix>r`    | draw relation tree of the callers of the token under cursor, based on `cscope`      |
+| `<prefix>R`    | draw relation tree of the callees of the token under cursor, based on `cscope`      |
+| `<prefix>l`    | draw relation tree of the callers of the token under cursor, based on `LSP`         |
+| `<prefix>L`    | draw relation tree of the callees of the token under cursor, based on `LSP`         |
+| `<prefix>x`    | close the relation tree of a certain token with a select prompt                     |
+| `<prefix>X`    | close all the relation trees                                                        |
+| `<prefix>w`    | switch to the view of relation tree of a certain token with a select prompt         |
+| `<Enter>`      | pressing in the relation tree jumps to the token in the certain line                |
+| `r` or `<Tab>` | pressing in the relation tree toggles the relation of the token in the certain line |
 
 #### Using `:Cscope` command
 
