@@ -21,10 +21,8 @@ local function make_buffer(session)
     vim.o.relativenumber = false
 
     local new_buffer = vim.api.nvim_get_current_buf()
-    vim.api.nvim_buf_set_option(new_buffer, "filetype", "calltree")
-
     vim.api.nvim_buf_set_name(new_buffer, "__CALLTREE__." .. symbol.ctx .. "." .. st.stringify(session.type))
-
+    vim.api.nvim_buf_set_option(new_buffer, "filetype", "calltree")
     vim.api.nvim_set_current_win(current_window)
     vim.api.nvim_win_set_cursor(0, cursor_pos)
     vim.api.nvim_set_current_tabpage(current_layout)
@@ -39,7 +37,9 @@ M.refresh_ui = function(session, entry_maker)
 
     session.line_nr_to_tree_node = {}
     local char_graph = tree.char_graph(session.tree_root, entry_maker, session.line_nr_to_tree_node)
+    vim.api.nvim_buf_set_option(session.call_tree_buffer, "modifiable", true)
     vim.api.nvim_buf_set_lines(session.call_tree_buffer, 0, -1, false, char_graph)
+    vim.api.nvim_buf_set_option(session.call_tree_buffer, "modifiable", false)
     vim.api.nvim_set_current_win(session.call_tree_window)
 end
 
