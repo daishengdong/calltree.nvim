@@ -243,7 +243,11 @@ end
 local function init_keymaps(prefix)
     local ok, wk = pcall(require, "which-key")
     if ok then
-        wk.register({ [prefix] = { name = "+cscope" } })
+        if wk.add then
+            wk.add({ { prefix, group = "+cscope" } })
+        else
+            wk.register({ [prefix] = { name = "+cscope" } })
+        end
     end
     vim.keymap.set("n", prefix .. "r", function() CallerTreeCscope() end, { desc = "Caller tree(cscope)" })
     vim.keymap.set("n", prefix .. "R", function() CalleeTreeCscope() end, { desc = "Callee tree(cscope)" })
